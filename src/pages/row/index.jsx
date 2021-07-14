@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 import { Drawer, Form, Button, Col, Row, Input, Popconfirm, message, Typography } from "antd";
 import { useLocation } from 'react-router-dom'
 import { platformApi } from '../../helper/api';
+import { Spin, Space } from 'antd';
 
 const { Title } = Typography;
 const Index = () => {
@@ -12,6 +13,7 @@ const Index = () => {
     const [visibleEditSection, setVisibleEditSection] = useState(false);
     const [visibleAddRow, setVisibleAddRow] = useState(false);
     const [visibleInputFields, setVisibleInputFields] = useState(false);
+    const [loading, setLoading] = useState(false)
     const [secValue, setSecValue] = useState({
         sectionId: "",
         title: "",
@@ -109,33 +111,43 @@ const Index = () => {
         // history.push(`/application/${designId[2]}`)
         returnPromise().then(() => {
             history.push(`/application/${designId[2]}`)
-        }).catch()
+            setLoading(false)
+            message.success("Columns added auccessfully", 2)
+        }).catch(err => {
+            setLoading(false)
+            message.error("Columns added failed", 2)
+        })
 
     }
 
 
     const returnPromise = () => {
-        return new Promise(async(resolve, reject) => {
-            for (let i = 0; i < rows.length; i++) {
-                const res = await platformApi.post(`/row/save/${secId}`,
-                    { title: rows[i]?.data?.title, details: rows[i]?.data?.details })
-                // .then(res => {
-                let { data } = res;
-                let rowId = data.rowId;
-                // console.log(rows)
+        return new Promise(async (resolve, reject) => {
+            try {
+                for (let i = 0; i < rows.length; i++) {
+                    const res = await platformApi.post(`/row/save/${secId}`,
+                        { title: rows[i]?.data?.title, details: rows[i]?.data?.details })
+                    // .then(res => {
+                    let { data } = res;
+                    let rowId = data.rowId;
+                    // console.log(rows)
 
-                for (let j = 0; j < rows[i].columns.length; j++) {
-                    await platformApi.post(`/columns/save/${rowId}`,
-                        { type: rows[i].columns[j].inputType, inputModel: { inputType: rows[i].columns[j].inputType } })
-                    // .then().catch()
+                    for (let j = 0; j < rows[i].columns.length; j++) {
+                        await platformApi.post(`/columns/save/${rowId}`,
+                            { type: rows[i].columns[j].inputType, inputModel: { inputType: rows[i].columns[j].inputType } })
+                        // .then().catch()
+                    }
+
+                    // })
+                    // .catch(err => {
+
+                    // })
                 }
+                resolve({ status: true })
 
-                // })
-                // .catch(err => {
-
-                // })
+            } catch (error) {
+                reject({ status: false })
             }
-            resolve({ status: true })
 
         })
     }
@@ -211,228 +223,231 @@ const Index = () => {
     return (
 
         <>
-            <div className={classes.nav}>
-                <div onClick={() => history.goBack()} style={{ cursor: "pointer" }}><ArrowLeftOutlined /> {"Go Back"}</div>
-                <div>
-                    <button onClick={() => setVisibleRow(true)} className={classes.primary_btn}><PlusOutlined /> Add row to Section</button>
-                    <button onClick={done} className={classes.secondary_btn}> <CheckOutlined /> Done</button>
-                    <button onClick={() => setVisibleEditSection(true)} className={classes.secondary_btn}> <EditOutlined /> Edit</button>
-                    <Popconfirm title="Are you sure？" okText="Yes" cancelText="No" onConfirm={onDeleteSection}>
-                        <button className={classes.secondary_btn} href="#"><DeleteOutlined /> Remove</button>
-                    </Popconfirm>
-                </div>
-            </div>
 
-            {/* Section view */}
+            {loading ? <Spin size="large" style={{ display: "flex", height: "100vh", alignItems: "center", justifyContent: "center" }} /> :
+                <>
+                    <div className={classes.nav}>
+                        <div onClick={() => history.goBack()} style={{ cursor: "pointer" }}><ArrowLeftOutlined /> {"Go Back"}</div>
+                        <div>
+                            <button onClick={() => setVisibleRow(true)} className={classes.primary_btn}><PlusOutlined /> Add row to Section</button>
+                            <button onClick={done} className={classes.secondary_btn}> <CheckOutlined /> Done</button>
+                            <button onClick={() => setVisibleEditSection(true)} className={classes.secondary_btn}> <EditOutlined /> Edit</button>
+                            <Popconfirm title="Are you sure？" okText="Yes" cancelText="No" onConfirm={onDeleteSection}>
+                                <button className={classes.secondary_btn} href="#"><DeleteOutlined /> Remove</button>
+                            </Popconfirm>
+                        </div>
+                    </div>
 
-            <div style={{ padding: "1rem 2rem" }}>
-                <Title style={{ color: '#000' }} level={3}>{secValue.title}</Title>
-                <Title level={5}>{secValue.details}</Title>
-            </div>
+                    {/* Section view */}
 
-            {/* row */}
+                    <div style={{ padding: "1rem 2rem" }}>
+                        <Title style={{ color: '#000' }} level={3}>{secValue.title}</Title>
+                        <Title level={5}>{secValue.details}</Title>
+                    </div>
 
-            <div className={classes.rows}>
+                    {/* row */}
 
-                {
-                    rows && rows.map((ele, index) => {
+                    <div className={classes.rows}>
 
-
-                        return (
-                            <div key={index} className={classes.row} style={{ marginBottom: "2rem" }}>
-                                <h2 style={{ textAlign: "left" }}>{ele?.data?.title} {"  "} <h4 style={{ textAlign: "left" }}>{ele?.data?.details}</h4> </h2>
-
-                                < Row gutter={16} >
-                                    {ele.columns && ele.columns.length > 0 && ele.columns.map((val, i) => {
-                                        return <Col key={i} className={classes.col} span={24 / ele.count}>
-                                            <div style={style} >
-                                                {val?.inputType ? <Input
-                                                    placeholder="Enter the Details"
-                                                    type={val.inputType}
-                                                /> :
-                                                    <PlusSquareOutlined onClick={() => setIndexes(index, i)} style={{ color: "#1890ff", fontSize: "1.5rem" }} />
-                                                }
-                                            </div>
-                                        </Col>
-                                    })
-                                    }
-                                </Row>
-                            </div>
-                        )
-                    })
-
-                }
-                <Button onClick={() => setVisibleRow(true)} style={{ padding: "0px 3.5rem" }} type="dashed" icon={<PlusOutlined />}>
-                    Add row
-                </Button>
-
-            </div>
+                        {
+                            rows && rows.map((ele, index) => {
 
 
-            {/* Add rows align */}
+                                return (
+                                    <div key={index} className={classes.row} style={{ marginBottom: "2rem" }}>
+                                        <h2 style={{ textAlign: "left" }}>{ele?.data?.title} {"  "} <h4 style={{ textAlign: "left" }}>{ele?.data?.details}</h4> </h2>
 
-            <Drawer
-                title="New Section"
-                width={400}
-                closable={false}
-                onClose={() => setVisibleRow(false)}
-                visible={visibleRow}
-                bodyStyle={{ paddingBottom: 80 }}
-            >
+                                        < Row gutter={16} >
+                                            {ele.columns && ele.columns.length > 0 && ele.columns.map((val, i) => {
+                                                return <Col key={i} className={classes.col} span={24 / ele.count}>
+                                                    <div style={style} >
+                                                        {val?.inputType ? <Input
+                                                            placeholder="Enter the Details"
+                                                            type={val.inputType}
+                                                        /> :
+                                                            <PlusSquareOutlined onClick={() => setIndexes(index, i)} style={{ color: "#1890ff", fontSize: "1.5rem" }} />
+                                                        }
+                                                    </div>
+                                                </Col>
+                                            })
+                                            }
+                                        </Row>
+                                    </div>
+                                )
+                            })
 
-                <div className={classes.alignment} onClick={() => addRowstoSections(1)}>
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                </div>
-                <div className={classes.alignment} onClick={() => addRowstoSections(2)}>
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                </div>
-                <div className={classes.alignment} onClick={() => addRowstoSections(3)}>
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                </div>
-                <div className={classes.alignment} onClick={() => addRowstoSections(4)}>
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                    <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
-                </div>
-
-                {/* Add roes */}
-                <Drawer
-                    title="Enter row Details"
-                    width={320}
-                    closable={false}
-                    onClose={() => setVisibleAddRow(false)}
-                    visible={visibleAddRow}
-                    bodyStyle={{ paddingBottom: 80 }}
-                >
-                    <Form
-                        layout="vertical"
-                        onFinish={onCreateRows}
-                        onFinishFailed={onFinishFailed}
-                    >
-                        <Row gutter={16}>
-                            <Col span={24}>
-                                <Form.Item
-                                    name="title"
-                                    label="Title"
-                                    rules={[{ required: true, message: "Title is required" }]}
-                                >
-                                    <Input
-                                        value={rowValue.title}
-                                        name="title"
-                                        onChange={handleRowEvents}
-                                    />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-
-                        <Row gutter={16}>
-                            <Col span={24}>
-                                <Form.Item name="details" label="Details">
-                                    <Input.TextArea rows={3}
-                                        value={rowValue.details}
-                                        name="details"
-                                        onChange={handleRowEvents}
-                                    />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit">
-                                Create
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </Drawer>
-
-            </Drawer>
-
-            {/* Edit sections */}
-
-            <Drawer
-                title="New Section"
-                width={320}
-                closable={false}
-                onClose={() => setVisibleEditSection(false)}
-                visible={visibleEditSection}
-                bodyStyle={{ paddingBottom: 80 }}
-            >
-                <Form
-                    layout="vertical"
-                    onFinish={onEditSection}
-                    onFinishFailed={onFinishFailed}
-                    form={form}
-                >
-                    <Row gutter={16}>
-                        <Col span={24}>
-                            <Form.Item
-                                name="title"
-                                label="Title"
-                                rules={[{ required: true, message: "Title is required" }]}
-                            >
-                                <Input
-                                    value={secValue.title}
-                                    name="title"
-                                    onChange={handleSectionEvents}
-                                />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Row gutter={16}>
-                        <Col span={24}>
-                            <Form.Item name="details" label="Details">
-                                <Input.TextArea rows={3}
-                                    value={secValue.details}
-                                    name="details"
-                                    onChange={handleSectionEvents}
-                                />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            Update
+                        }
+                        <Button onClick={() => setVisibleRow(true)} style={{ padding: "0px 3.5rem" }} type="dashed" icon={<PlusOutlined />}>
+                            Add row
                         </Button>
-                    </Form.Item>
-                </Form>
-            </Drawer>
 
-            {/* Add input field */}
+                    </div>
 
-            <Drawer
-                title="New Section"
-                width={400}
-                closable={false}
-                onClose={() => setVisibleInputFields(false)}
-                visible={visibleInputFields}
-                bodyStyle={{ paddingBottom: 80 }}
-            >
+                    {/* Add rows align */}
 
-                <div className={classes.inputAlignment} onClick={() => addInputFields("text")} >
-                    Text Input
-                </div>
-                <div className={classes.inputAlignment} onClick={() => addInputFields("number")}>
-                    Number Input
-                </div>
-                {/* <div className={classes.inputAlignment} onClick={() => addInputFields("checkbox")}>
+                    <Drawer
+                        title="New Section"
+                        width={400}
+                        closable={false}
+                        onClose={() => setVisibleRow(false)}
+                        visible={visibleRow}
+                        bodyStyle={{ paddingBottom: 80 }}
+                    >
+
+                        <div className={classes.alignment} onClick={() => addRowstoSections(1)}>
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                        </div>
+                        <div className={classes.alignment} onClick={() => addRowstoSections(2)}>
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                        </div>
+                        <div className={classes.alignment} onClick={() => addRowstoSections(3)}>
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                        </div>
+                        <div className={classes.alignment} onClick={() => addRowstoSections(4)}>
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                            <AlignCenterOutlined style={{ fontSize: "4rem", color: "#777" }} />
+                        </div>
+
+                        {/* Add roes */}
+                        <Drawer
+                            title="Enter row Details"
+                            width={320}
+                            closable={false}
+                            onClose={() => setVisibleAddRow(false)}
+                            visible={visibleAddRow}
+                            bodyStyle={{ paddingBottom: 80 }}
+                        >
+                            <Form
+                                layout="vertical"
+                                onFinish={onCreateRows}
+                                onFinishFailed={onFinishFailed}
+                            >
+                                <Row gutter={16}>
+                                    <Col span={24}>
+                                        <Form.Item
+                                            name="title"
+                                            label="Title"
+                                            rules={[{ required: true, message: "Title is required" }]}
+                                        >
+                                            <Input
+                                                value={rowValue.title}
+                                                name="title"
+                                                onChange={handleRowEvents}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+
+                                <Row gutter={16}>
+                                    <Col span={24}>
+                                        <Form.Item name="details" label="Details">
+                                            <Input.TextArea rows={3}
+                                                value={rowValue.details}
+                                                name="details"
+                                                onChange={handleRowEvents}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                                <Form.Item>
+                                    <Button type="primary" htmlType="submit">
+                                        Create
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </Drawer>
+
+                    </Drawer>
+
+                    {/* Edit sections */}
+
+                    <Drawer
+                        title="New Section"
+                        width={320}
+                        closable={false}
+                        onClose={() => setVisibleEditSection(false)}
+                        visible={visibleEditSection}
+                        bodyStyle={{ paddingBottom: 80 }}
+                    >
+                        <Form
+                            layout="vertical"
+                            onFinish={onEditSection}
+                            onFinishFailed={onFinishFailed}
+                            form={form}
+                        >
+                            <Row gutter={16}>
+                                <Col span={24}>
+                                    <Form.Item
+                                        name="title"
+                                        label="Title"
+                                        rules={[{ required: true, message: "Title is required" }]}
+                                    >
+                                        <Input
+                                            value={secValue.title}
+                                            name="title"
+                                            onChange={handleSectionEvents}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+
+                            <Row gutter={16}>
+                                <Col span={24}>
+                                    <Form.Item name="details" label="Details">
+                                        <Input.TextArea rows={3}
+                                            value={secValue.details}
+                                            name="details"
+                                            onChange={handleSectionEvents}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit">
+                                    Update
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Drawer>
+
+                    {/* Add input field */}
+
+                    <Drawer
+                        title="New Section"
+                        width={400}
+                        closable={false}
+                        onClose={() => setVisibleInputFields(false)}
+                        visible={visibleInputFields}
+                        bodyStyle={{ paddingBottom: 80 }}
+                    >
+
+                        <div className={classes.inputAlignment} onClick={() => addInputFields("text")} >
+                            Text Input
+                        </div>
+                        <div className={classes.inputAlignment} onClick={() => addInputFields("number")}>
+                            Number Input
+                        </div>
+                        {/* <div className={classes.inputAlignment} onClick={() => addInputFields("checkbox")}>
                     Checkbox
                 </div> */}
-                {/* <div className={classes.inputAlignment} onClick={() => addInputFields("radio")}>
+                        {/* <div className={classes.inputAlignment} onClick={() => addInputFields("radio")}>
                     Radio
                 </div> */}
-                <div className={classes.inputAlignment} onClick={() => addInputFields("date")}>
-                    Date Picker
-                </div>
-                <div className={classes.inputAlignment} onClick={() => addInputFields("file")}>
-                    File Upload
-                </div>
+                        <div className={classes.inputAlignment} onClick={() => addInputFields("date")}>
+                            Date Picker
+                        </div>
+                        <div className={classes.inputAlignment} onClick={() => addInputFields("file")}>
+                            File Upload
+                        </div>
 
-            </Drawer>
-
+                    </Drawer>
+                </>
+            }
         </>
     )
 }
