@@ -29,11 +29,12 @@ const Application = () => {
     })
 
     let designId = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
-    
-    
+
+    console.log("------" + designId)
 
     useEffect(() => {
         if (designId) {
+            console.log("------" + designId)
             setPrimaryData()
         }
     }, [])
@@ -122,7 +123,9 @@ const Application = () => {
                     </div>
 
 
-                    <Section />
+                    <Section
+                        designId={designId}
+                    />
 
                 </div>
 

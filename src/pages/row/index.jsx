@@ -38,6 +38,7 @@ const Index = () => {
     let designId = location.pathname.split("/");
 
 
+    console.log(designId)
 
     useEffect(() => {
         if (secId) {

@@ -17,3 +17,6 @@ if (port == null || port == "") {
 app.listen(
     port,
     () => console.log("Server started on port 8000"));
+
+
+    //     // "start": "node server.js",

@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RichTextEditor from 'react-rte';
 import classes from "./termsandpolicies.module.css";
 import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { message, Radio } from 'antd';
 import { useHistory } from "react-router-dom";
+// import { platformApi } from '../../helper/api';
 
 
 function TermsAndPolicies() {
 
     const history = useHistory();
     const [value, setValue] = useState(RichTextEditor.createEmptyValue());
+    // const location = useLocation();
+
+    // let designId = location.pathname.split("/");
+
+    // useEffect(() => {
+    //     platformApi.get(`/title/${designId}`)
+    //         .then(res => {
+    //             let { data } = res;
+    //             setValue(data)
+    //             form.setFieldsValue(data);
+
+    //         }).catch(err => {
+    //             history.push(`/`);
+    //             message.error("Something went wrong!!", 3)
+    //         })
+    // })
 
 
     const onSave = () => {
@@ -63,7 +80,7 @@ function TermsAndPolicies() {
                     </div>
 
                 </div>
-                <div>Right</div>
+                <div>{""}</div>
             </div>
 
 
