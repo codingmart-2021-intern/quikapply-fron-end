@@ -9,6 +9,7 @@ import { platformApi } from "../../helper/api";
 function Home() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [value, setValue] = useState({
     title: "",
     email: "",
@@ -25,15 +26,21 @@ function Home() {
 
   const onFinish = (values) => {
 
+    setLoading(true)
     console.log("Success:", values);
 
     platformApi.post("/saveDesign", values).
       then(res => {
         let { data } = res;
+
+        setLoading(false)
+
         message.success("Application Saved!!", 3);
         history.push(`/application/${data.designId}`);
       }).
       catch(err => {
+        setLoading(false)
+
         message.error("Something went wrong!!", 3);
       })
 
@@ -154,7 +161,7 @@ function Home() {
             </Col>
           </Row>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={loading} >
               Create
             </Button>
           </Form.Item>

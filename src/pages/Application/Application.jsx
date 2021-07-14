@@ -138,7 +138,7 @@ const Application = () => {
 
 
                     <span
-                        onClick={() => history.push("/application/:title/terms-and-policies")}
+                        onClick={() => history.push(`/application/${designId}/terms-and-policies`)}
                         className={classes.terms}
                     >
                         <EditOutlined /> Terms & Policies

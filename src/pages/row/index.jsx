@@ -200,7 +200,7 @@ const Index = () => {
 
         <>
             <div className={classes.nav}>
-                <div onClick={() => history.goBack()} style={{ cursor: "pointer" }}><ArrowLeftOutlined /> {"Nav"}</div>
+                <div onClick={() => history.goBack()} style={{ cursor: "pointer" }}><ArrowLeftOutlined /> {"Go Back"}</div>
                 <div>
                     <button onClick={() => setVisibleRow(true)} className={classes.primary_btn}><PlusOutlined /> Add row to Section</button>
                     <button onClick={done} className={classes.secondary_btn}> <CheckOutlined /> Done</button>

@@ -4,33 +4,57 @@ import classes from "./termsandpolicies.module.css";
 import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { message, Radio } from 'antd';
 import { useHistory } from "react-router-dom";
-// import { platformApi } from '../../helper/api';
+import { platformApi } from '../../helper/api';
+import { useLocation } from 'react-router-dom'
+
 
 
 function TermsAndPolicies() {
 
     const history = useHistory();
-    const [value, setValue] = useState(RichTextEditor.createEmptyValue());
-    // const location = useLocation();
+    const [terms, setTerms] = useState(RichTextEditor.createEmptyValue());
+    const [policies, setPolicies] = useState(RichTextEditor.createEmptyValue());
+    const [sig, setSig] = useState(true);
+    const [val, setVal] = useState();
 
-    // let designId = location.pathname.split("/");
+    const location = useLocation();
 
-    // useEffect(() => {
-    //     platformApi.get(`/title/${designId}`)
-    //         .then(res => {
-    //             let { data } = res;
-    //             setValue(data)
-    //             form.setFieldsValue(data);
+    let designId = location.pathname.split("/");
 
-    //         }).catch(err => {
-    //             history.push(`/`);
-    //             message.error("Something went wrong!!", 3)
-    //         })
-    // })
+    useEffect(() => {
+        platformApi.get(`/title/${designId[2]}`)
+            .then(res => {
+                let { data } = res;
+                // setTerms(data.terms || "");
+                // setPolicies(data.policies | "")
+                // form.setFieldsValue(data);
+                setSig(data.signature_enabled)
+                setVal(data)
+                console.log(data)
+
+            }).catch(err => {
+                history.push(`/`);
+                message.error("Something went wrong!!", 3)
+            })
+    }, [])
 
 
     const onSave = () => {
+        let obj = { ...val };
+        obj['signature_enabled'] = sig;
+        console.log(obj)
+        platformApi.put(`/updateDesign/${designId[2]}`, obj)
         message.success("Application saved!!", 2)
+    }
+
+
+    const onChange = (e) => {
+        if (e.target.value == 1) {
+            setSig(true)
+        }
+        else {
+            setSig(false)
+        }
     }
 
     return (
@@ -57,22 +81,22 @@ function TermsAndPolicies() {
                     <div className={classes.editor}>
                         <h2 style={{ fontWeight: "bold" }}>Terms</h2>
                         <RichTextEditor
-                            value={value}
-                        // onChange={this.onChange}
+                            value={terms}
+                        // onChange={onChange}
                         />
                     </div>
 
                     <div className={classes.editor}>
                         <h2 style={{ fontWeight: "bold" }}>Policies</h2>
                         <RichTextEditor
-                            value={value}
-                        // onChange={this.onChange}
+                            value={policies}
+                        // onChange={onChange}
                         />
                     </div>
 
                     <div className={classes.editor}>
                         <h2 style={{ fontWeight: "bold" }}>Required Signature?</h2>
-                        <Radio.Group name="radiogroup" defaultValue={1}>
+                        <Radio.Group name="radiogroup" value={sig ? 1 : 2} onChange={(e) => onChange(e)}>
                             <Radio value={1}>Enabled</Radio>
                             <Radio value={2}>Disabled</Radio>
                         </Radio.Group>
