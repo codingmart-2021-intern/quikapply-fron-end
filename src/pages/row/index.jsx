@@ -123,7 +123,9 @@ const Index = () => {
 
     const returnPromise = () => {
         return new Promise(async (resolve, reject) => {
+            setLoading(true)
             try {
+              
                 for (let i = 0; i < rows.length; i++) {
                     const res = await platformApi.post(`/row/save/${secId}`,
                         { title: rows[i]?.data?.title, details: rows[i]?.data?.details })
