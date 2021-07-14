@@ -9,6 +9,7 @@ import Section from "./pages/Section/Section";
 import TermsAndPolicies from "./pages/TermsAndPolicies/TermsAndPolicies";
 import Publish from "./pages/Publish/Publish";
 import Row from "./pages/row"
+import QuickView from "./pages/quickView";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route exact path="/application/:title/section/:id" component={Row} />
         <Route exact path="/application/:title/terms-and-policies" component={TermsAndPolicies} />
         <Route exact path="/application/:randomurl/apply" component={Publish} />
+        <Route exact path="/application/:randomurl/quick" component={QuickView} />
       </Switch>
     </Router>
   );
