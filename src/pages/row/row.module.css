@@ -66,3 +66,30 @@
     border: .5px solid #1890ff;
     
 }
+
+
+.rows{
+    text-align: center;
+    background: rgb(240, 242, 245);
+    padding: 4rem;
+}
+.row{
+    padding: 1rem;
+    border: 1px solid rgb(240, 242, 245);
+
+}
+   
+
+.row:hover{
+    border: 1px solid #1890ff;
+}
+
+.col{
+    cursor: pointer;
+    border: 1px solid rgb(240, 242, 245);
+}
+
+
+.col:hover{
+    border: 1px solid #1890ff;
+}

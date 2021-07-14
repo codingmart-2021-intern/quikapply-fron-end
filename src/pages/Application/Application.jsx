@@ -98,7 +98,7 @@ const Application = () => {
             then((res) => {
                 let { data } = res;
                 message.success("Sections added!!", 3)
-                history.push(`/application/${value.title}/section/${data.sectionId}`);
+                history.push(`/application/${value.designId}/section/${data.sectionId}`);
             }).catch(err => {
                 message.error("error in saving sections!!", 3)
             })
