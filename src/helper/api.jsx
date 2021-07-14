@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000"
+const baseUrl = "https://quickapplybackend.herokuapp.com/"
 
 //and interceptor comes here
 const platformApi = axios.create({
