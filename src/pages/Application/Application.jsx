@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import classes from "./application.module.css";
 import { Drawer, Form, Button, Col, Row, Input, message } from "antd";
-import { EditOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { Modal } from 'antd';
+import { EditOutlined, PlusOutlined, UnorderedListOutlined, EyeOutlined } from '@ant-design/icons';
 import Section from '../Section/Section';
 import { useHistory } from "react-router-dom";
 import { platformApi } from '../../helper/api';
@@ -10,6 +11,7 @@ import { useLocation } from 'react-router-dom'
 
 
 const Application = () => {
+    const [popVisible, setPopVisible] = useState(false)
     const [visible, setVisible] = useState(false);
     const [visibleSection, setVisibleSection] = useState(false);
     const [loading, setLoading] = useState(false)
@@ -27,10 +29,11 @@ const Application = () => {
         title: "test",
         details: ""
     })
+    const [sec, setSec] = useState([]);
 
     let designId = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
 
-    console.log("------" + designId)
+
 
     useEffect(() => {
         if (designId) {
@@ -38,6 +41,22 @@ const Application = () => {
             setPrimaryData()
         }
     }, [])
+
+
+    useEffect(() => {
+        console.log("------" + designId)
+        platformApi.get(`/title/${designId}`)
+            .then(res => {
+                let { data } = res;
+                console.log( data)
+                setSec(data.sections)
+            })
+            .catch(err => {
+
+            })
+
+    }, [])
+
 
 
     const setPrimaryData = () => {
@@ -106,6 +125,10 @@ const Application = () => {
     }
 
 
+    const handleOk = () => {
+        history.push(`/application/${designId}/apply`)
+    }
+
     return (
         <>
             <div style={{ display: "flex" }}>
@@ -117,7 +140,16 @@ const Application = () => {
                         <div style={{ textTransform: 'capitalize' }}>{value.title}</div>
                         <div>
                             <button onClick={() => setVisibleSection(true)} className={classes.primary_btn}><PlusOutlined /> Add Section</button>
+                            {sec.length > 0 &&
 
+                                < button
+                                    className={classes.primary_btn}
+                                    onClick={() => setPopVisible(true)}
+                                >
+                                    <EyeOutlined /> publish
+                                </button>
+
+                            }
                             <button onClick={() => setVisible(true)} className={classes.secondary_btn}> <EditOutlined /> Edit</button>
                         </div>
                     </div>
@@ -125,6 +157,7 @@ const Application = () => {
 
                     <Section
                         designId={designId}
+                        sec={sec}
                     />
 
                 </div>
@@ -266,6 +299,14 @@ const Application = () => {
                 </Form>
             </Drawer>
 
+            <Modal
+                title="Publish application?"
+                visible={popVisible}
+                onOk={handleOk}
+                onCancel={() => setPopVisible(false)}
+            >
+                <p>You'll be unable to further update your application after it is published.</p>
+            </Modal>
 
         </>
     )

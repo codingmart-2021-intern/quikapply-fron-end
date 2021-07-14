@@ -106,26 +106,38 @@ const Index = () => {
 
 
     const done = () => {
-        for (let i = 0; i < rows.length; i++) {
-            platformApi.post(`/row/save/${secId}`,
-                { title: rows[i]?.data?.title, details: rows[i]?.data?.details })
-                .then(res => {
-                    let { data } = res;
-                    let rowId = data.rowId;
-                    // console.log(rows)
+        // history.push(`/application/${designId[2]}`)
+        returnPromise().then(() => {
+            history.push(`/application/${designId[2]}`)
+        }).catch()
 
-                    for (let j = 0; j < rows[i].columns.length; j++) {
-                        platformApi.post(`/columns/save/${rowId}`,
-                            { type: rows[i].columns[j].inputType, inputModel: { inputType: rows[i].columns[j].inputType } })
-                            .then().catch()
-                    }
-                })
-                .catch(err => {
+    }
 
-                })
-        }
 
-        history.push(`/application/${designId[2]}`)
+    const returnPromise = () => {
+        return new Promise(async(resolve, reject) => {
+            for (let i = 0; i < rows.length; i++) {
+                const res = await platformApi.post(`/row/save/${secId}`,
+                    { title: rows[i]?.data?.title, details: rows[i]?.data?.details })
+                // .then(res => {
+                let { data } = res;
+                let rowId = data.rowId;
+                // console.log(rows)
+
+                for (let j = 0; j < rows[i].columns.length; j++) {
+                    await platformApi.post(`/columns/save/${rowId}`,
+                        { type: rows[i].columns[j].inputType, inputModel: { inputType: rows[i].columns[j].inputType } })
+                    // .then().catch()
+                }
+
+                // })
+                // .catch(err => {
+
+                // })
+            }
+            resolve({ status: true })
+
+        })
     }
 
 
