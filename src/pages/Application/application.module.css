@@ -1,0 +1,61 @@
+.nav{
+    background-color: #1890ff;
+    height: 65px;
+    width: 100%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 0rem 0px 3rem;
+}
+
+
+
+.primary_btn{
+    background-color: #fff;
+    color: #000;
+    padding: 4px 20px;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.secondary_btn {
+    background-color: transparent;
+    color: #fff;
+    padding: 4px 20px;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.sections{
+    background-color: transparent;
+    color: #fff;
+    padding: 4px 20px;
+    border: none;
+    margin-right: 2rem;
+}
+
+.application_page{
+    width: 85%;
+}
+
+.application_page_right{
+    width: 15%;
+    background-color: #1890ff;
+    height: 100vh;
+    text-align: center;
+    position: sticky;
+    top: 0;
+}
+
+.terms{
+    background-color: #0d477e;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+}

@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { Drawer, Form, Button, Col, Row, Input } from "antd";
+import { Drawer, Form, Button, Col, Row, Input, message } from "antd";
 import { useHistory } from "react-router-dom";
 import Footer from "../../components/footer/footer";
 import "./Home.css";
+import { platformApi } from "../../helper/api";
+
 
 function Home() {
   const history = useHistory();
   const [visible, setVisible] = useState(false);
+  const [value, setValue] = useState({
+    title: "",
+    email: "",
+    details: ""
+  })
 
   const showDrawer = () => {
     setVisible(true);
@@ -17,13 +24,34 @@ function Home() {
   };
 
   const onFinish = (values) => {
+
     console.log("Success:", values);
-    history.push(`/application/${values.title}`);
+
+    platformApi.post("/saveDesign", values).
+      then(res => {
+        let { data } = res;
+        message.success("Application Saved!!", 3);
+        history.push(`/application/${data.designId}`);
+      }).
+      catch(err => {
+        message.error("Something went wrong!!", 3);
+      })
+
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
+
+
+  const handleEvents = (e) => {
+    setValue((pre) => {
+      return {
+        ...pre, [e.target.name]: e.target.value
+      }
+    })
+  }
+
 
   return (
     <>
@@ -89,7 +117,11 @@ function Home() {
                 label="Title"
                 rules={[{ required: true, message: "Title is required" }]}
               >
-                <Input />
+                <Input
+                  value={value.title}
+                  name="title"
+                  onChange={handleEvents}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -101,14 +133,23 @@ function Home() {
                 tooltip="The email address submissions will be sent to."
                 rules={[{ required: true, message: "Email is required" }]}
               >
-                <Input />
+                <Input
+                  value={value.email}
+                  name="email"
+                  onChange={handleEvents}
+                />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item name="details" label="Details">
-                <Input.TextArea rows={3} />
+                <Input.TextArea
+                  rows={3}
+                  value={value.details}
+                  name="details"
+                  onChange={handleEvents}
+                />
               </Form.Item>
             </Col>
           </Row>
