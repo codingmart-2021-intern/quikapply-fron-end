@@ -80,6 +80,7 @@ const Index = () => {
                 ) :
                     ""
             }
+             <Button type="primary" style={{float:"right",marginRight:"1rem"}}>Submit</Button>
         </div>
 
     )
