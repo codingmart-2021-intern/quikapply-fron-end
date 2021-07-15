@@ -15,6 +15,7 @@ const Application = () => {
     const [visible, setVisible] = useState(false);
     const [visibleSection, setVisibleSection] = useState(false);
     const [loading, setLoading] = useState(false)
+    const [sectionLoad, setSectionLoad] = useState(false)
     const history = useHistory();
     const location = useLocation();
     const [form] = Form.useForm();
@@ -33,8 +34,6 @@ const Application = () => {
 
     let designId = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
 
-
-
     useEffect(() => {
         if (designId) {
             console.log("------" + designId)
@@ -42,22 +41,20 @@ const Application = () => {
         }
     }, [])
 
-
     useEffect(() => {
-        console.log("------" + designId)
+        setSectionLoad(true)
         platformApi.get(`/title/${designId}`)
             .then(res => {
                 let { data } = res;
-                console.log( data)
+                console.log(data)
                 setSec(data.sections)
+                setSectionLoad(false)
+
             })
             .catch(err => {
-
+                setSectionLoad(false)
             })
-
     }, [])
-
-
 
     const setPrimaryData = () => {
         platformApi.get(`/title/${designId}`)
@@ -71,7 +68,6 @@ const Application = () => {
                 message.error("Something went wrong!!", 3)
             })
     }
-
 
     const onFinishFailed = (errorInfo) => {
         console.log("Failed:", errorInfo);
@@ -94,7 +90,6 @@ const Application = () => {
         }
     };
 
-
     const handleEvents = (e) => {
         setValue((pre) => {
             return {
@@ -102,7 +97,6 @@ const Application = () => {
             }
         })
     }
-
 
     const handleSectionEvents = (e) => {
         setSecValue((pre) => {
@@ -158,6 +152,7 @@ const Application = () => {
                     <Section
                         designId={designId}
                         sec={sec}
+                        loading={sectionLoad}
                     />
 
                 </div>
