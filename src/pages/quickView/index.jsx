@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import classes from "./quick.module.css";
 import { useLocation } from 'react-router-dom'
-import { Col, Row, Input, } from "antd";
+import { Col, Row, Input, Button, } from "antd";
 import { PlusSquareOutlined } from '@ant-design/icons';
 import { platformApi } from '../../helper/api';
 
@@ -80,6 +80,8 @@ const Index = () => {
                 ) :
                     ""
             }
+
+            {/* <Button type="primary" style={{float:"right",marginRight:"1rem"}}>Submit</Button> */}
         </div>
 
     )
